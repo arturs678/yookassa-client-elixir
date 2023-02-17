@@ -35,67 +35,77 @@ defmodule DefaultYookassaClient do
 
     @impl YookassaClient
     @spec create_payment(DefaultYookassaClient.t(), String.t(), map()) ::
-            {:ok, map()} | {:error, map()}
+            {:ok, map()} | {:error, {:http_error, HTTPoison.Error.t()} | {:yokassa_error, map()}}
     def create_payment(client, idempotence_key, body) do
-      case response =
-             post!(
-               "/payments",
-               body,
-               [authorization_header(client), idempotence_key_header(idempotence_key)]
-             ) do
-        %HTTPoison.Response{status_code: 200} ->
-          {:ok, response.body}
+      case post(
+             "/payments",
+             body,
+             [authorization_header(client), idempotence_key_header(idempotence_key)]
+           ) do
+        {:ok, %HTTPoison.Response{status_code: 200} = response} ->
+          {:ok, response}
 
-        %HTTPoison.Response{} ->
-          {:error, response.body}
+        {:ok, %HTTPoison.Response{} = response} ->
+          {:error, {:yookassa_error, response.body}}
+
+        {:error, %HTTPoison.Error{} = error} ->
+          {:error, {:http_error, error}}
       end
     end
 
     @impl YookassaClient
     @spec capture_payment(DefaultYookassaClient.t(), String.t(), String.t(), map()) ::
-            {:ok, map()} | {:error, map()}
+            {:ok, map()} | {:error, {:http_error, HTTPoison.Error.t()} | {:yokassa_error, map()}}
     def capture_payment(client, idempotence_key, id, body) do
-      case response =
-             post!(
-               "/payments/#{id}/capture",
-               body,
-               [authorization_header(client), idempotence_key_header(idempotence_key)]
-             ) do
-        %HTTPoison.Response{status_code: 200} ->
-          {:ok, response.body}
+      case post(
+             "/payments/#{id}/capture",
+             body,
+             [authorization_header(client), idempotence_key_header(idempotence_key)]
+           ) do
+        {:ok, %HTTPoison.Response{status_code: 200} = response} ->
+          {:ok, response}
 
-        %HTTPoison.Response{} ->
-          {:error, response.body}
+        {:ok, %HTTPoison.Response{} = response} ->
+          {:error, {:yookassa_error, response.body}}
+
+        {:error, %HTTPoison.Error{} = error} ->
+          {:error, {:http_error, error}}
       end
     end
 
     @impl YookassaClient
     @spec cancel_payment(DefaultYookassaClient.t(), String.t(), String.t()) ::
-            {:ok, map()} | {:error, map()}
+            {:ok, map()} | {:error, {:http_error, HTTPoison.Error.t()} | {:yokassa_error, map()}}
     def cancel_payment(client, idempotence_key, id) do
-      case response =
-             post!(
-               "/payments/#{id}/cancel",
-               %{},
-               [authorization_header(client), idempotence_key_header(idempotence_key)]
-             ) do
-        %HTTPoison.Response{status_code: 200} ->
-          {:ok, response.body}
+      case post(
+             "/payments/#{id}/cancel",
+             %{},
+             [authorization_header(client), idempotence_key_header(idempotence_key)]
+           ) do
+        {:ok, %HTTPoison.Response{status_code: 200} = response} ->
+          {:ok, response}
 
-        %HTTPoison.Response{} ->
-          {:error, response.body}
+        {:ok, %HTTPoison.Response{} = response} ->
+          {:error, {:yookassa_error, response.body}}
+
+        {:error, %HTTPoison.Error{} = error} ->
+          {:error, {:http_error, error}}
       end
     end
 
     @impl YookassaClient
-    @spec get_payment(DefaultYookassaClient.t(), String.t()) :: {:ok, map()} | {:error, map()}
+    @spec get_payment(DefaultYookassaClient.t(), String.t()) ::
+            {:ok, map()} | {:error, {:http_error, HTTPoison.Error.t()} | {:yokassa_error, map()}}
     def get_payment(client, id) do
-      case response = get!("/payments/#{id}", [authorization_header(client)]) do
-        %HTTPoison.Response{status_code: 200} ->
-          {:ok, response.body}
+      case get("/payments/#{id}", [authorization_header(client)]) do
+        {:ok, %HTTPoison.Response{status_code: 200} = response} ->
+          {:ok, response}
 
-        %HTTPoison.Response{} ->
-          {:error, response.body}
+        {:ok, %HTTPoison.Response{} = response} ->
+          {:error, {:yookassa_error, response.body}}
+
+        {:error, %HTTPoison.Error{} = error} ->
+          {:error, {:http_error, error}}
       end
     end
 
