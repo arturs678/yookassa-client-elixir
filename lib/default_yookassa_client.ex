@@ -43,7 +43,7 @@ defmodule DefaultYookassaClient do
              [authorization_header(client), idempotence_key_header(idempotence_key)]
            ) do
         {:ok, %HTTPoison.Response{status_code: 200} = response} ->
-          {:ok, response}
+          {:ok, response.body}
 
         {:ok, %HTTPoison.Response{} = response} ->
           {:error, {:yookassa_error, response.body}}
@@ -63,7 +63,7 @@ defmodule DefaultYookassaClient do
              [authorization_header(client), idempotence_key_header(idempotence_key)]
            ) do
         {:ok, %HTTPoison.Response{status_code: 200} = response} ->
-          {:ok, response}
+          {:ok, response.body}
 
         {:ok, %HTTPoison.Response{} = response} ->
           {:error, {:yookassa_error, response.body}}
@@ -83,7 +83,7 @@ defmodule DefaultYookassaClient do
              [authorization_header(client), idempotence_key_header(idempotence_key)]
            ) do
         {:ok, %HTTPoison.Response{status_code: 200} = response} ->
-          {:ok, response}
+          {:ok, response.body}
 
         {:ok, %HTTPoison.Response{} = response} ->
           {:error, {:yookassa_error, response.body}}
@@ -99,7 +99,7 @@ defmodule DefaultYookassaClient do
     def get_payment(client, id) do
       case get("/payments/#{id}", [authorization_header(client)]) do
         {:ok, %HTTPoison.Response{status_code: 200} = response} ->
-          {:ok, response}
+          {:ok, response.body}
 
         {:ok, %HTTPoison.Response{} = response} ->
           {:error, {:yookassa_error, response.body}}
